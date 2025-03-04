@@ -13,7 +13,7 @@ type StorageToken = {
 };
 
 type CacheStorage = {
-    onGet: () => string | undefined;
+    onGet: () => ( string | undefined ) | Promise< string | undefined >;
     onSet: (token: string) => any | Promise<any>;
 };
 
