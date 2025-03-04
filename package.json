@@ -7,7 +7,18 @@
     "url": "git+https://github.com/wetoon/william-pack-googleapis.git"
   },
   "main": "src/index.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "devDependencies": {
+    "bun-plugin-dts": "latest",
     "@types/bun": "latest"
   },
   "peerDependencies": {
@@ -27,9 +38,15 @@
     "realtime",
     "database"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "license": "MIT",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "bun build.ts"
   }
 }
