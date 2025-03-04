@@ -1,0 +1,35 @@
+{
+  "name": "@william-pack/googleapis",
+  "version": "1.0.0",
+  "author": "William-pack",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wetoon/william-pack-googleapis.git"
+  },
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "bugs": {
+    "url": "https://github.com/wetoon/william-pack-googleapis/issues"
+  },
+  "description": "A serverless API that integrates with Google Drive and Firebase Realtime Database to manage file storage and real-time data synchronization. Built for seamless authentication, secure data handling, and efficient cloud operations.",
+  "homepage": "https://github.com/wetoon/william-pack-googleapis#readme",
+  "keywords": [
+    "google",
+    "api",
+    "googleapis",
+    "drive",
+    "firebase",
+    "realtime",
+    "database"
+  ],
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
