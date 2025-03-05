@@ -20,3 +20,12 @@ await build({
     outdir: "dist",
     naming: "index.cjs"
 })
+
+await build({
+    entrypoints: ["./src/index.ts"],
+    minify: false,
+    format: "esm",
+    target: "node",
+    outdir: "dist",
+    naming: "index.js"
+})

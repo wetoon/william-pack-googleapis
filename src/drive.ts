@@ -4,14 +4,14 @@ import { GoogleAuth } from "."
 export class GoogleDrive {
 
     private google: GoogleAuth;
-    private folderId: string[]
+    private folderId: string[];
 
-    constructor( google: GoogleAuth, folderId: string[] ) {
+    constructor( google: GoogleAuth, folderId?: string[] ) {
         this.google = google
-        this.folderId = folderId
+        this.folderId = folderId ?? []
     }
 
-    public create = async ( file: File ): Promise<string> => {
+    public async create( file: File ): Promise<string> {
         const body = new FormData();
         body.append( "metadata", new Blob([
             JSON.stringify({
@@ -27,7 +27,7 @@ export class GoogleDrive {
         return id;
     }
 
-    public remove = async ( fileId: string ): Promise< true | false > => {
+    public async remove( fileId: string ): Promise< true | false > {
         const token = await this.google.getRefreshToken();
         try {
             await fetch( `https://www.googleapis.com/drive/v3/files/${ fileId }`, {
@@ -39,7 +39,7 @@ export class GoogleDrive {
         }
     }
 
-    public findAll = async () => {
+    public async findAll() {
         const token = await this.google.getRefreshToken();
         try {
             const response = await fetch( `https://www.googleapis.com/drive/v3/files?q='me' in owners&fields=files(id, name)`, {

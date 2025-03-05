@@ -84,3 +84,4 @@ export class GoogleAuth {
 }
 
 export { GoogleDrive } from "./drive";
+export { GoogleDatabase } from "./database";
