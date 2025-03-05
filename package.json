@@ -6,7 +6,6 @@
     "type": "git",
     "url": "git+https://github.com/wetoon/william-pack-googleapis.git"
   },
-  "main": "src/index.ts",
   "exports": {
     "types": "./dist/index.d.ts",
     "import": "./dist/index.mjs",
