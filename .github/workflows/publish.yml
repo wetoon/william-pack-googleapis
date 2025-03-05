@@ -1,6 +1,9 @@
 
 name: Publish Library
 
+permissions:
+    id-token: write
+
 on:
     release:
         types: [ published ]
