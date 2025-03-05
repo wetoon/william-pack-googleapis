@@ -1,90 +1,86 @@
+
 import { getAccessToken } from "./utils";
 
 export type GoogleServiceAccount = {
     project_id: string;
     private_key: string;
     client_email: string;
-    [key: string]: string;
+    [ key: string ]: string;
 };
 
-type StorageToken = {
+export type initializeAuth = {
+    credential: string | GoogleServiceAccount;
+    cache?: CacheTokenToStorage
+}
+
+export type CacheToken = {
     token: string;
     exp: number;
 };
 
-type CacheStorage = {
-    onGet: () => ( string | undefined ) | Promise< string | undefined >;
-    onSet: (token: string) => any | Promise<any>;
+export type CacheTokenToStorage = {
+    onGet: () => string | CacheToken | undefined | Promise< string | CacheToken | undefined >;
+    onSet: ( value: CacheToken ) => any | Promise< any >;
 };
 
 export class GoogleAuth {
 
-    private ServiceAccount: GoogleServiceAccount;
-    public cacheToken?: CacheStorage;
+    private serviceAccount: GoogleServiceAccount;
+    private localCache = new Map<'access',CacheToken>;
 
-    public getAuth() {
-        return this.ServiceAccount;
+    private parseJSON( value: string ) {
+        try {
+            return JSON.parse( value );
+        } catch {
+            return {}
+        }
+    }
+
+    public cache: CacheTokenToStorage = {
+        onGet: () => this.localCache.get('access'),
+        onSet: ( token ) => this.localCache.set('access',token)
     }
 
     public async getRefreshToken() {
-        const setCacheToken = async (token: string) => {
-            if ( !this.cacheToken?.onSet ) return false;
-            try {
-                const storageToken: StorageToken = { token, exp: Date.now() + 3599e3 };
-                await this.cacheToken.onSet( JSON.stringify( storageToken ) );
-                return true;
-            } catch (e) {
-                console.error( "Failed to set cache token:", e );
-                return false;
-            }
-        };
 
-        if ( this.cacheToken?.onGet ) {
-            const jsonToken = this.cacheToken.onGet();
-            if ( jsonToken && jsonToken !== '{}' ) {
-                try {
-                    const { token, exp }: StorageToken = JSON.parse( jsonToken );
-                    if ( exp > Date.now() ) {
-                        return token;
-                    }
-                } catch (e) {
-                    console.error("Failed to parse cached token:", e);
-                }
+        const access = await this.cache.onGet();
+
+        if ( typeof access == "string" ) {
+            const json_parse: CacheToken = JSON.parse( access );
+            if ( typeof json_parse.token == "string" && typeof json_parse.exp == "number" && json_parse.exp > Date.now() ) {
+                return json_parse.token
+            }
+        }
+        else if ( typeof access == "object" && typeof access.token == "string" && typeof access.exp == "number" ) {
+            if ( access.exp > Date.now() ) {
+                return access.token
             }
         }
 
         try {
-            const token = await getAccessToken( this.getAuth() );
-            await setCacheToken( token as string );
-            return token;
-        } catch (e) {
-            console.error("Failed to get access token:", e);
-            throw e;
+            const token = await getAccessToken( this.serviceAccount );
+            await this.cache.onSet({ token: token as string, exp: Date.now() + 3598e3 })
+            return token
+        } catch {
+            return undefined
         }
-    }
-
-    constructor( initialize: { credential: GoogleServiceAccount | string; cacheToken?: CacheStorage } ) {
-        
-        let service: GoogleServiceAccount;
-
-        if ( typeof initialize.credential === "string" ) {
-            try {
-                service = JSON.parse( initialize.credential );
-            } catch (e) {
-                throw new Error("Invalid credential JSON string");
-            }
-        } else {
-            service = initialize.credential;
-        }
-
-        if ( !service.project_id || !service.private_key || !service.client_email ) {
-            throw new Error("ServiceAccount requires project_id, private_key, and client_email");
-        }
-
-        this.ServiceAccount = service;
-        this.cacheToken = initialize.cacheToken;
 
     }
+    
+    constructor( initialize: initializeAuth ) {
+
+        this.serviceAccount = typeof initialize.credential == "object" ? initialize.credential : this.parseJSON( initialize.credential );
+
+        if ( !this.serviceAccount.client_email || !this.serviceAccount.project_id || !this.serviceAccount.private_key ) {
+            throw new Error("Googleapis require { client_email, project_id, private_key }")
+        }
+
+        if ( initialize.cache && typeof initialize.cache.onGet == "function" && typeof initialize.cache.onSet == "function" ) {
+            this.cache = initialize.cache
+        }
+
+    }
+
 }
 
 export { GoogleDrive } from "./drive";

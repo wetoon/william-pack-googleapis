@@ -1,0 +1,48 @@
+
+name: Publish Library
+
+on:
+    release:
+        types: [ published ]
+
+defaults:
+    run:
+        shell: bash
+
+env:
+    ACTIONS_RUNNER_DEBUG: true
+
+jobs:
+    publish:
+        name: 'Publish: william-pack registry'
+        runs-on: ubuntu-latest
+        steps:
+
+            - name: checkout code
+              uses: actions/checkout@v3
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '22.x'
+                registry-url: 'https://registry.npmjs.org'
+            
+            - name: setup bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                bun-version: latest
+                registry-url: "https://registry.npmjs.org"
+            
+            - name: install dependencies
+              run: bun install
+
+            - name: build project
+              run: bun build.ts
+
+            - name: uninstall build tool
+              run: bun remove @types/bun bun-plugin-dts typescript
+
+            - name: publish registry
+              env:
+                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: npm publish --provenance --access=public
