@@ -14,6 +14,7 @@ env:
 
 jobs:
     publish:
+        environment: PUBLISH
         name: 'Publish: william-pack registry'
         runs-on: ubuntu-latest
         steps:
