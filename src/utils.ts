@@ -4,7 +4,7 @@ type GoogleAuthResponse = { access_token: string, expires_in: 3599, token_type: 
 
 export async function getAccessToken( credential: GoogleServiceAccount ): Promise< string | undefined > {
 
-    const scopes = ["https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/firebase.database"];
+    const scopes = ["https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/firebase.database","https://www.googleapis.com/auth/userinfo.email"];
     
     function ptob( pem: string ): ArrayBuffer {
         const base64Key = pem
