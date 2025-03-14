@@ -10,7 +10,7 @@ export class GoogleDatabase {
 
         this.google = google;
 
-        if ( !/^https:\/\/[a-zA-Z0-9\-]+\.firebaseio\.com\/$/.test( databaseURL ) ) {
+        if ( !databaseURL.includes('https') && !databaseURL.includes('firebasedatabase.app') ) {
             throw new Error("Invalid firebase realtime database url")
         }
 
